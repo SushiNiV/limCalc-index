@@ -4,14 +4,73 @@
     <meta charset="UTF-8">
     <title>Limit Calculator</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="overall">
+        <div class="side-container">
+        </div>
+        <div class="calculator-container">
+            <div class="calculator">
+                <h2>LIMIT CALCULATOR</h2>
+                <form method="POST" autocomplete="off">
+                    <input type="hidden" name="limit_type" value="direct">
+
+                    <div class="input-group">
+                        <input 
+                            id="lim-expression"  
+                            name="lim-expression" 
+                            placeholder="lim = [expression] [variable] → [value]" 
+                            required
+                        >
+                    </div>
+
+                    <div class="output-section">
+                        <textarea 
+                            readonly
+                            class="result-textarea"
+                            placeholder="Result will appear here">{% if result %}{{ result }}{% elif error %}Error: {{ error }}{% endif %}</textarea>
+                    </div>
+
+                    <div class="button-grid">
+                        <button type="button" onclick="insert('lim')">lim</button>
+                        <button type="button" onclick="insert('→')">→</button>
+                        <button type="button" onclick="insert('∞')">∞</button>
+                        <button type="button" onclick="deleteChar()">DEL</button>
+                        <button type="button" onclick="insert('7')">7</button>
+                        <button type="button" onclick="insert('8')">8</button>
+                        <button type="button" onclick="insert('9')">9</button>
+                        <button type="button" onclick="insert('/')">÷</button>
+                        <button type="button" onclick="insert('4')">4</button>
+                        <button type="button" onclick="insert('5')">5</button>
+                        <button type="button" onclick="insert('6')">6</button>
+                        <button type="button" onclick="insert('*')">×</button>
+                        <button type="button" onclick="insert('1')">1</button>
+                        <button type="button" onclick="insert('2')">2</button>
+                        <button type="button" onclick="insert('3')">3</button>
+                        <button type="button" onclick="insert('-')">−</button>
+                        <button type="button" onclick="insert('0')">0</button>
+                        <button type="button" onclick="insert('.')">.</button>
+                        <button type="button" onclick="insert('+')">+</button>
+                        <button type="button" onclick="insert('^')">^</button>
+                        <button type="button" onclick="insert('x')">x</button>
+                        <button type="button" onclick="insert('(')">(</button>
+                        <button type="button" onclick="insert(')')">)</button>
+                        <button type="button" onclick="clearInput()">CLR</button>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Calculate</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const exprInput = document.getElementById("expression");
-            const varInput = document.getElementById("variable");
-            const toValueInput = document.querySelector('input[name="to_value"]');
+            const exprInput = document.getElementById("lim-expression");  // Correct the id here
 
+            // Event listeners for input
             exprInput.addEventListener("keypress", function (e) {
-                const allowed = /[0-9xX\+\-\*\/\^\(\)\.\s]/;
+                const allowed = /[0-9xX\+\-\*\/\^\(\)\.\s=]/;
                 if (!allowed.test(e.key)) {
                     e.preventDefault();
                 }
@@ -23,108 +82,20 @@
                     this.form.requestSubmit();
                 }
             });
-
-            varInput.addEventListener("keypress", function (e) {
-                // Only allow alphabet characters (a-z, A-Z)
-                if (!/^[a-zA-Z]$/.test(e.key)) {
-                    e.preventDefault(); // Prevent typing anything that's not a letter
-                }
-            });
-
-            varInput.addEventListener("keydown", function (e) {
-                if (e.key === "Enter") {
-                    if (!this.value.trim()) {
-                        e.preventDefault();
-                        this.classList.add("input-error"); // Add visual cue if field is empty
-                    } else {
-                        e.preventDefault();
-                        toValueInput.focus();
-                    }
-                }
-            });
-
-            varInput.addEventListener("input", function () {
-                if (this.value.trim()) {
-                    this.classList.remove("input-error");
-                }
-            });
         });
 
         function insert(value) {
-            document.getElementById("expression").value += value;
+            document.getElementById("lim-expression").value += value;  // Use the correct id here
         }
 
         function clearInput() {
-            document.getElementById("expression").value = "";
+            document.getElementById("lim-expression").value = "";  // Use the correct id here
         }
 
         function deleteChar() {
-            const input = document.getElementById("expression");
+            const input = document.getElementById("lim-expression");  // Use the correct id here
             input.value = input.value.slice(0, -1);
         }
-
-        function updateExpressionTemplate() {
-            const exprInput = document.getElementById("expression");
-            const toInput = document.querySelector('input[name="to_value"]');
-            exprInput.value = "";
-            toInput.value = "";
-        }
     </script>
-</head>
-<body>
-    <div class="overall">
-    <div class="side-container">
-    </div>
-    <div class="calculator-container">
-    <div class="calculator">
-        <h2>LIMIT CALCULATOR</h2>
-        <form method="POST" autocomplete="off">
-            <input type="hidden" name="limit_type" value="direct">
-
-            <div class="input-group">
-                <input id="expression" name="expression" placeholder="Build your expression" required>
-                <input id="variable" name="variable" placeholder="x" required pattern="[a-zA-Z]+" title="Only letters allowed">
-                <input name="to_value" placeholder="x → ?" required>
-            </div>
-
-            <div class="output-section">
-                <textarea 
-                    readonly
-                    class="result-textarea"
-                    placeholder="Result will appear here">{% if result %}{{ result }}{% elif error %}Error: {{ error }}{% endif %}</textarea>
-            </div>
-
-            <div class="button-grid">
-                <button type="button" onclick="insert('lim')">lim</button>
-                <button type="button" onclick="insert('→')">→</button>
-                <button type="button" onclick="insert('∞')">∞</button>
-                <button type="button" onclick="deleteChar()">DEL</button>
-                <button type="button" onclick="insert('7')">7</button>
-                <button type="button" onclick="insert('8')">8</button>
-                <button type="button" onclick="insert('9')">9</button>
-                <button type="button" onclick="insert('/')">÷</button>
-                <button type="button" onclick="insert('4')">4</button>
-                <button type="button" onclick="insert('5')">5</button>
-                <button type="button" onclick="insert('6')">6</button>
-                <button type="button" onclick="insert('*')">×</button>
-                <button type="button" onclick="insert('1')">1</button>
-                <button type="button" onclick="insert('2')">2</button>
-                <button type="button" onclick="insert('3')">3</button>
-                <button type="button" onclick="insert('-')">−</button>
-                <button type="button" onclick="insert('0')">0</button>
-                <button type="button" onclick="insert('.')">.</button>
-                <button type="button" onclick="insert('+')">+</button>
-                <button type="button" onclick="insert('^')">^</button>
-                <button type="button" onclick="insert('x')">x</button>
-                <button type="button" onclick="insert('(')">(</button>
-                <button type="button" onclick="insert(')')">)</button>
-                <button type="button" onclick="clearInput()">CLR</button>
-            </div>
-
-            <button type="submit" class="submit-btn">Calculate</button>
-        </form>
-    </div>
-    </div>
-    </div>
 </body>
 </html>
