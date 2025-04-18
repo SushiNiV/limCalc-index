@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Limit Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const exprInput = document.getElementById("expression");
+
+            exprInput.addEventListener("keypress", function (e) {
+                const allowed = /[0-9xX\+\-\*\/\^\(\)\.\s]/;
+                if (!allowed.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
+
+            exprInput.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    this.form.requestSubmit();
+                }
+            });
+
+            const dropdown = document.querySelector('.custom-dropdown');
+            const dropdownOptions = dropdown.querySelector('.dropdown-options');
+            dropdown.addEventListener('mouseenter', function () {
+                dropdown.classList.add('open');
+            });
+            dropdown.addEventListener('mouseleave', function () {
+                dropdown.classList.remove('open');
+            });
+
+            const options = dropdown.querySelectorAll('li');
+            options.forEach(function (option) {
+                option.addEventListener('click', function () {
+                    const selectedValue = this.getAttribute('data-value');
+                    const selectedText = this.querySelector('.option-text').textContent;
+                    document.getElementById('selectedOption').textContent = selectedText;
+                    document.getElementById('limitTypeInput').value = selectedValue;
+                });
+            });
+        });
+
+        function insert(value) {
+            document.getElementById("expression").value += value;
+        }
+
+        function clearInput() {
+            document.getElementById("expression").value = "";
+        }
+
+        function deleteChar() {
+            const input = document.getElementById("expression");
+            input.value = input.value.slice(0, -1);
+        }
+
+        function updateExpressionTemplate() {
+            const exprInput = document.getElementById("expression");
+            const toInput = document.querySelector('input[name="to_value"]');
+            exprInput.value = "";
+            toInput.value = "";
+        }
+    </script>
+</head>
+<body>
+    <div class="calculator">
+        <h2>LIMIT CALCULATOR</h2>
+        <form method="POST" autocomplete="off">
+            <label for="limit_type">Choose Limit Type:</label>
+            <div class="custom-dropdown">
+                <div class="selected-option" id="selectedOption">Limit of a constant</div>
+                <ul class="dropdown-options">
+                    <li data-value="constant"><span class="option-text">Limit of a constant</span></li>
+                    <li data-value="direct"><span class="option-text">Limit as x → c</span><span class="beta">β</span></li>
+                    <li data-value="multiple"><span class="option-text">Constant multiple theorem</span><span class="beta">β</span></li>
+                    <li data-value="addition"><span class="option-text">Addition theorem</span><span class="beta">β</span></li>
+                    <li data-value="subtraction"><span class="option-text">Subtraction theorem</span><span class="beta">β</span></li>
+                    <li data-value="multiplication"><span class="option-text">Multiplication theorem</span><span class="beta">β</span></li>
+                    <li data-value="division"><span class="option-text">Division theorem</span><span class="beta">β</span></li>
+                    <li data-value="power"><span class="option-text">Power theorem</span><span class="beta">β</span></li>
+                    <li data-value="radical"><span class="option-text">Radical theorem</span><span class="beta">β</span></li>
+                    <li data-value="root"><span class="option-text">Root theorem</span><span class="beta">β</span></li>
+                </ul>
+                <input type="hidden" name="limit_type" id="limitTypeInput" value="direct">
+            </div>
+
+            <div class="input-group">
+                <input id="expression" name="expression" placeholder="Build your expression" required>
+                <input name="variable" placeholder="x" required>
+                <input name="to_value" placeholder="x → ?" required>
+            </div>
+
+            <div class="button-grid">
+                <button type="button" onclick="insert('lim')">lim</button>
+                <button type="button" onclick="insert('→')">→</button>
+                <button type="button" onclick="insert('∞')">∞</button>
+                <button type="button" onclick="deleteChar()">DEL</button>
+                <button type="button" onclick="insert('7')">7</button>
+                <button type="button" onclick="insert('8')">8</button>
+                <button type="button" onclick="insert('9')">9</button>
+                <button type="button" onclick="insert('/')">÷</button>
+                <button type="button" onclick="insert('4')">4</button>
+                <button type="button" onclick="insert('5')">5</button>
+                <button type="button" onclick="insert('6')">6</button>
+                <button type="button" onclick="insert('*')">×</button>
+                <button type="button" onclick="insert('1')">1</button>
+                <button type="button" onclick="insert('2')">2</button>
+                <button type="button" onclick="insert('3')">3</button>
+                <button type="button" onclick="insert('-')">−</button>
+                <button type="button" onclick="insert('0')">0</button>
+                <button type="button" onclick="insert('.')">.</button>
+                <button type="button" onclick="insert('+')">+</button>
+                <button type="button" onclick="insert('^')">^</button>
+                <button type="button" onclick="insert('x')">x</button>
+                <button type="button" onclick="insert('(')">(</button>
+                <button type="button" onclick="insert(')')">)</button>
+                <button type="button" onclick="clearInput()">CLR</button>
+            </div>
+
+            <button type="submit" class="submit-btn">Calculate</button>
+        </form>
+
+        {% if result %}
+            <div class="result">
+            Result: {{ result }}<br>
+        {% if limit_type %}
+            <small>Limit Type: {{ limit_type.replace('_', ' ').title() }}</small>
+        {% endif %}
+            </div>
+        {% elif error %}
+            <div class="error">Error: {{ error }}</div>
+        {% endif %}
+
+    </div>
+</body>
+</html>
