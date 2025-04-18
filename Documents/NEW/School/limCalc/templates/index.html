@@ -7,6 +7,8 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const exprInput = document.getElementById("expression");
+            const varInput = document.getElementById("variable");
+            const toValueInput = document.querySelector('input[name="to_value"]');
 
             exprInput.addEventListener("keypress", function (e) {
                 const allowed = /[0-9xX\+\-\*\/\^\(\)\.\s]/;
@@ -22,23 +24,29 @@
                 }
             });
 
-            const dropdown = document.querySelector('.custom-dropdown');
-            const dropdownOptions = dropdown.querySelector('.dropdown-options');
-            dropdown.addEventListener('mouseenter', function () {
-                dropdown.classList.add('open');
-            });
-            dropdown.addEventListener('mouseleave', function () {
-                dropdown.classList.remove('open');
+            varInput.addEventListener("keypress", function (e) {
+                // Only allow alphabet characters (a-z, A-Z)
+                if (!/^[a-zA-Z]$/.test(e.key)) {
+                    e.preventDefault(); // Prevent typing anything that's not a letter
+                }
             });
 
-            const options = dropdown.querySelectorAll('li');
-            options.forEach(function (option) {
-                option.addEventListener('click', function () {
-                    const selectedValue = this.getAttribute('data-value');
-                    const selectedText = this.querySelector('.option-text').textContent;
-                    document.getElementById('selectedOption').textContent = selectedText;
-                    document.getElementById('limitTypeInput').value = selectedValue;
-                });
+            varInput.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    if (!this.value.trim()) {
+                        e.preventDefault();
+                        this.classList.add("input-error"); // Add visual cue if field is empty
+                    } else {
+                        e.preventDefault();
+                        toValueInput.focus();
+                    }
+                }
+            });
+
+            varInput.addEventListener("input", function () {
+                if (this.value.trim()) {
+                    this.classList.remove("input-error");
+                }
             });
         });
 
@@ -64,31 +72,26 @@
     </script>
 </head>
 <body>
+    <div class="overall">
+    <div class="side-container">
+    </div>
+    <div class="calculator-container">
     <div class="calculator">
         <h2>LIMIT CALCULATOR</h2>
         <form method="POST" autocomplete="off">
-            <label for="limit_type">Choose Limit Type:</label>
-            <div class="custom-dropdown">
-                <div class="selected-option" id="selectedOption">Limit of a constant</div>
-                <ul class="dropdown-options">
-                    <li data-value="constant"><span class="option-text">Limit of a constant</span></li>
-                    <li data-value="direct"><span class="option-text">Limit as x → c</span><span class="beta">β</span></li>
-                    <li data-value="multiple"><span class="option-text">Constant multiple theorem</span><span class="beta">β</span></li>
-                    <li data-value="addition"><span class="option-text">Addition theorem</span><span class="beta">β</span></li>
-                    <li data-value="subtraction"><span class="option-text">Subtraction theorem</span><span class="beta">β</span></li>
-                    <li data-value="multiplication"><span class="option-text">Multiplication theorem</span><span class="beta">β</span></li>
-                    <li data-value="division"><span class="option-text">Division theorem</span><span class="beta">β</span></li>
-                    <li data-value="power"><span class="option-text">Power theorem</span><span class="beta">β</span></li>
-                    <li data-value="radical"><span class="option-text">Radical theorem</span><span class="beta">β</span></li>
-                    <li data-value="root"><span class="option-text">Root theorem</span><span class="beta">β</span></li>
-                </ul>
-                <input type="hidden" name="limit_type" id="limitTypeInput" value="direct">
-            </div>
+            <input type="hidden" name="limit_type" value="direct">
 
             <div class="input-group">
                 <input id="expression" name="expression" placeholder="Build your expression" required>
-                <input name="variable" placeholder="x" required>
+                <input id="variable" name="variable" placeholder="x" required pattern="[a-zA-Z]+" title="Only letters allowed">
                 <input name="to_value" placeholder="x → ?" required>
+            </div>
+
+            <div class="output-section">
+                <textarea 
+                    readonly
+                    class="result-textarea"
+                    placeholder="Result will appear here">{% if result %}{{ result }}{% elif error %}Error: {{ error }}{% endif %}</textarea>
             </div>
 
             <div class="button-grid">
@@ -120,18 +123,8 @@
 
             <button type="submit" class="submit-btn">Calculate</button>
         </form>
-
-        {% if result %}
-            <div class="result">
-            Result: {{ result }}<br>
-        {% if limit_type %}
-            <small>Limit Type: {{ limit_type.replace('_', ' ').title() }}</small>
-        {% endif %}
-            </div>
-        {% elif error %}
-            <div class="error">Error: {{ error }}</div>
-        {% endif %}
-
+    </div>
+    </div>
     </div>
 </body>
 </html>
